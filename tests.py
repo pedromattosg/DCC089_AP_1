@@ -140,4 +140,22 @@ def test_create_question_with_invalid_points():
     
     with pytest.raises(Exception):
         question = Question(title='q2', points=101)
-    
+
+@pytest.fixture
+def pergunta_emb():
+    question = Question(title='Qual é um avião da Embraer?', points=100, max_selections=1)
+    question.add_choice('737-800 Max', False)
+    question.add_choice('A350', False)
+    question.add_choice('Praetor 600', True)
+    question.add_choice('G550', False)
+    return question
+
+def test_select_correct_choice(pergunta_emb):
+    selected_choices = pergunta_emb.select_choices([3])
+    assert len(selected_choices) == 1
+    assert selected_choices[0] == 3
+    assert pergunta_emb.choices[2].is_correct
+
+def test_select_more_than_max_choices(pergunta_emb):
+    with pytest.raises(Exception):
+        selected_choices = pergunta_emb.select_choices([1,2,3])
